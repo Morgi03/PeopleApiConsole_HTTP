@@ -5,11 +5,12 @@ import java.util.Scanner;
 
 public class Main {
     static String url = "https://retoolapi.dev/0xaaMh/people";
+
     public static void main(String[] args) {
         try {
             newPersonFrontConsole();
-            String people = RequestHandler.get(url);
-            System.out.println(people);
+            Response people = RequestHandler.get(url);
+            System.out.println(people.getContent());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -24,6 +25,7 @@ public class Main {
         System.out.println("Adja meg az életkorát: ");
         String age = sc.nextLine();
         String json = String.format("{\"name\": \"%s\", \"email\": \"%s\", \"age\": \"%s\"}", name, email, age);
-        RequestHandler.post(url, json);
+        Response response = RequestHandler.post(url, json);
+        System.out.println(response.getContent());
     }
 }

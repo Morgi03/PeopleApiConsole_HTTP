@@ -5,8 +5,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public final class RequestHandler {
-    private RequestHandler(){}
-    public static String get(String url) throws IOException {
+    private RequestHandler() {
+    }
+
+    public static Response get(String url) throws IOException {
         HttpURLConnection connection = setupConnection(url);
         connection.setRequestMethod("GET");
         return getResponse(connection);
@@ -21,7 +23,7 @@ public final class RequestHandler {
         return connection;
     }
 
-    public static String post(String url, String data) throws IOException {
+    public static Response post(String url, String data) throws IOException {
         HttpURLConnection connection = setupConnection(url);
         connection.setRequestMethod("POST");
         addRequestBody(connection, data);
@@ -39,7 +41,7 @@ public final class RequestHandler {
         os.close();
     }
 
-    private static String getResponse(HttpURLConnection connection) throws IOException {
+    private static Response getResponse(HttpURLConnection connection) throws IOException {
         int responseCode = connection.getResponseCode();
         InputStream is = null;
         if (responseCode >= 400) {
@@ -56,6 +58,7 @@ public final class RequestHandler {
         }
         br.close();
         is.close();
-        return stringBuilder.toString().trim();
+        String content = stringBuilder.toString().trim();
+        return new Response(responseCode, content);
     }
 }
