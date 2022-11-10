@@ -1,24 +1,45 @@
 package hu.petrik.peopleapiconsole;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public final class RequestHandler {
-    private RequestHandler() {
+    private RequestHandler(){}
+    public static String get(String url) throws IOException {
+        HttpURLConnection connection = setupConnection(url);
+        connection.setRequestMethod("GET");
+        return getResponse(connection);
     }
 
-    public static String get(String url) throws IOException {
-        URL urkObj = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) urkObj.openConnection();
-        connection.setRequestMethod("GET");
+    private static HttpURLConnection setupConnection(String url) throws IOException {
+        URL urlObj = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
         connection.setConnectTimeout(10000);
         connection.setReadTimeout(10000);
         connection.setRequestProperty("Accept", "application/json");
+        return connection;
+    }
+
+    public static String post(String url, String data) throws IOException {
+        HttpURLConnection connection = setupConnection(url);
+        connection.setRequestMethod("POST");
+        addRequestBody(connection, data);
+        return getResponse(connection);
+    }
+
+    private static void addRequestBody(HttpURLConnection connection, String data) throws IOException {
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+        OutputStream os = connection.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+        writer.write(data);
+        writer.flush();
+        writer.close();
+        os.close();
+    }
+
+    private static String getResponse(HttpURLConnection connection) throws IOException {
         int responseCode = connection.getResponseCode();
         InputStream is = null;
         if (responseCode >= 400) {
@@ -35,8 +56,6 @@ public final class RequestHandler {
         }
         br.close();
         is.close();
-        connection.disconnect();
         return stringBuilder.toString().trim();
     }
-
 }
