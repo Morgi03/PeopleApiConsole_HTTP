@@ -14,13 +14,17 @@ public final class RequestHandler {
         return getResponse(connection);
     }
 
-    private static HttpURLConnection setupConnection(String url) throws IOException {
-        URL urlObj = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
-        connection.setConnectTimeout(10000);
-        connection.setReadTimeout(10000);
-        connection.setRequestProperty("Accept", "application/json");
-        return connection;
+    public static Response put(String url, String data) throws IOException {
+        HttpURLConnection connection = setupConnection(url);
+        connection.setRequestMethod("PUT");
+        addRequestBody(connection, data);
+        return getResponse(connection);
+    }
+
+    public Response delete(String url) throws IOException {
+        HttpURLConnection connection = setupConnection(url);
+        connection.setRequestMethod("DELETE");
+        return getResponse(connection);
     }
 
     public static Response post(String url, String data) throws IOException {
@@ -28,6 +32,15 @@ public final class RequestHandler {
         connection.setRequestMethod("POST");
         addRequestBody(connection, data);
         return getResponse(connection);
+    }
+
+    private static HttpURLConnection setupConnection(String url) throws IOException {
+        URL urlObj = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(10000);
+        connection.setRequestProperty("Accept", "application/json");
+        return connection;
     }
 
     private static void addRequestBody(HttpURLConnection connection, String data) throws IOException {
